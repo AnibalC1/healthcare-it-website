@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CalBookingWidget from "@/components/CalBookingWidget";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -255,29 +256,22 @@ export default function AssessmentPage() {
                 and you'll have your detailed report within 3-5 business days.
               </p>
 
-              {/* TODO: Replace with actual Cal.com embed */}
-              <div className="bg-white rounded-card p-12 text-text">
-                <p className="text-2xl font-bold mb-6">
-                  📅 Booking Calendar Coming Soon
-                </p>
-                <p className="text-text-muted mb-8">
-                  In the meantime, contact us directly to schedule your free assessment:
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a
-                    href="tel:+15551234567"
-                    className="btn btn-primary text-lg px-8 py-4"
-                  >
-                    📞 Call (555) 123-4567
-                  </a>
-                  <a
-                    href="/contact"
-                    className="btn btn-secondary text-lg px-8 py-4"
-                  >
-                    ✉️ Email Us
-                  </a>
-                </div>
+              {/* Cal.com Booking Widget */}
+              <div className="bg-white rounded-card p-8">
+                <CalBookingWidget className="min-h-[600px]" />
               </div>
+
+              <p className="text-sm text-white mt-6 opacity-75">
+                Prefer to contact us directly?{" "}
+                <a href="tel:+15551234567" className="underline hover:opacity-100">
+                  Call (555) 123-4567
+                </a>{" "}
+                or{" "}
+                <a href="/contact" className="underline hover:opacity-100">
+                  email us
+                </a>
+                .
+              </p>
             </div>
           </div>
         </section>

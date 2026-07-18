@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ChatWidget from "@/components/ChatWidget";
 
 export const metadata: Metadata = {
   title: "Healthcare IT Solutions | HIPAA-Compliant IT Services for Medical & Dental Practices",
@@ -58,6 +59,9 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           {children}
         </div>
+
+        {/* AI Chat Widget (global) */}
+        <ChatWidget />
       </body>
     </html>
   );
