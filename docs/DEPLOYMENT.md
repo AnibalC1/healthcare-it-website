@@ -50,13 +50,35 @@ NODE_ENV=production
 3. Paste contents of `lib/supabase-schema.sql`
 4. Execute the SQL script
 5. Verify tables created:
+
+   **Contact & Lead Capture:**
    - contact_submissions
    - assessment_bookings
    - chat_interactions
    - audit_log
-6. Go to Settings → API
-7. Copy Project URL and anon key
-8. Copy service_role key (keep this secret!)
+
+   **Client Portal:**
+   - clients
+   - tickets
+   - invoices
+   - compliance_documents
+   - knowledge_base_articles
+   - ticket_updates
+
+6. Enable Authentication:
+   - Go to Authentication → Providers
+   - Enable Email provider
+   - Configure email templates (optional)
+   - Enable "Confirm email" (recommended)
+
+7. Set up Row Level Security (RLS):
+   - RLS policies are automatically created by the schema
+   - Verify policies exist for all client portal tables
+   - Test with a test client account
+
+8. Go to Settings → API
+9. Copy Project URL and anon key
+10. Copy service_role key (keep this secret!)
 
 ## Vercel Deployment
 
@@ -105,13 +127,81 @@ vercel --prod
 
 ## Post-Deployment Checklist
 
-### Verify Functionality
+### Verify Core Functionality
 - [ ] Homepage loads correctly
 - [ ] All navigation links work
 - [ ] Contact form submits successfully
 - [ ] Cal.com booking widget displays
 - [ ] AI chat widget opens and responds
 - [ ] All pages are mobile-responsive
+
+### Verify Conversion Tools
+- [ ] **ROI Calculator** (`/roi-calculator`)
+  - [ ] 4-step flow works (practice info → pain points → results → email capture)
+  - [ ] Cost calculations display correctly
+  - [ ] Email submission stores in Supabase
+- [ ] **IT Health Check** (`/it-health-check`)
+  - [ ] 15-question quiz displays
+  - [ ] Progress bar updates correctly
+  - [ ] Security score calculates
+  - [ ] Category breakdown shows
+  - [ ] Email submission works
+- [ ] **Smart Appointment Routing** (`/assessment`)
+  - [ ] 4 inquiry types display (Emergency, Assessment, Consultation, Quick Question)
+  - [ ] Cal.com embeds load for each type
+  - [ ] Emergency phone CTA displays
+- [ ] **Exit-Intent Popups**
+  - [ ] Popup triggers on mouse-leave (test by moving cursor to browser top)
+  - [ ] Only shows once per session
+  - [ ] CTA links to correct pages
+
+### Verify Client Portal
+- [ ] **Portal Login** (`/portal/login`)
+  - [ ] Login form displays
+  - [ ] Email/password authentication works
+  - [ ] Session persists on page refresh
+  - [ ] "Forgot password" link works
+- [ ] **Portal Dashboard** (`/portal/dashboard`)
+  - [ ] Stats cards display (tickets, invoices, documents)
+  - [ ] Quick actions work
+  - [ ] Navigation cards link correctly
+- [ ] **Tickets Page** (`/portal/tickets`)
+  - [ ] Ticket list displays
+  - [ ] Filters work (all, open, in-progress, resolved, closed)
+  - [ ] "New Ticket" button accessible
+- [ ] **Invoices Page** (`/portal/invoices`)
+  - [ ] Invoice list displays
+  - [ ] Status badges show correctly
+  - [ ] Download/view actions work
+- [ ] **Compliance Documents** (`/portal/compliance`)
+  - [ ] Document list displays
+  - [ ] Expiry warnings show
+  - [ ] Download links work
+- [ ] **Knowledge Base** (`/portal/knowledge-base`)
+  - [ ] Article list displays
+  - [ ] Search functionality works
+  - [ ] Category filters work
+  - [ ] Video indicators display
+
+### Verify Trust Signals
+- [ ] **Google Reviews Widget**
+  - [ ] 4.9/5 rating displays
+  - [ ] 4 review cards show
+  - [ ] "Read all reviews" link works
+- [ ] **HIPAA Badge**
+  - [ ] Badge displays on forms
+  - [ ] Certification text visible
+- [ ] **Security Badges**
+  - [ ] 256-bit Encryption badge shows
+  - [ ] TLS 1.3 badge shows
+  - [ ] SOC 2 Type II badge shows
+- [ ] **Social Proof Counter**
+  - [ ] "47+ practices" counter displays
+  - [ ] Star rating shows
+- [ ] **Video Testimonials**
+  - [ ] Testimonial grid displays
+  - [ ] Filters work (practice type, service)
+  - [ ] Video modal opens on click
 
 ### Security Verification
 - [ ] SSL/TLS enabled (https://)
