@@ -29,17 +29,20 @@ DETAILED ANSWERS:
 ${Object.entries(answers).map(([q, a]) => `${q}: ${a ? 'YES' : 'NO'}`).join('\n')}`,
         source_page: '/it-health-check',
         status: 'new',
-      });
+      })
+      .select();
 
     if (error) throw error;
 
     // Log audit event
-    await supabaseAdmin.rpc('log_audit_event', {
-      p_action: 'health_check_submission',
-      p_resource_type: 'contact_submission',
-      p_resource_id: data?.[0]?.id,
-      p_metadata: { email, practiceName, score, recommendations },
-    });
+    if (data && data[0]) {
+      await supabaseAdmin.rpc('log_audit_event', {
+        p_action: 'health_check_submission',
+        p_resource_type: 'contact_submission',
+        p_resource_id: data[0].id,
+        p_metadata: { email, practiceName, score, recommendations },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

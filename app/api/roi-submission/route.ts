@@ -33,17 +33,20 @@ CALCULATED RESULTS:
 - ROI: ${results.roiPercentage}%`,
         source_page: '/roi-calculator',
         status: 'new',
-      });
+      })
+      .select();
 
     if (error) throw error;
 
     // Log audit event
-    await supabaseAdmin.rpc('log_audit_event', {
-      p_action: 'roi_calculator_submission',
-      p_resource_type: 'contact_submission',
-      p_resource_id: data?.[0]?.id,
-      p_metadata: { email, practiceName, results },
-    });
+    if (data && data[0]) {
+      await supabaseAdmin.rpc('log_audit_event', {
+        p_action: 'roi_calculator_submission',
+        p_resource_type: 'contact_submission',
+        p_resource_id: data[0].id,
+        p_metadata: { email, practiceName, results },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
