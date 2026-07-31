@@ -1,224 +1,178 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import Link from "next/link";
-import type { Metadata } from "next";
+'use client';
 
-export const metadata: Metadata = {
-  title: "HIPAA Security Awareness Training | Healthcare IT Solutions",
-  description:
-    "HIPAA-required security awareness training for medical and dental practice staff. Phishing simulations, annual documentation, and audit-ready records for Central Massachusetts practices.",
-  openGraph: {
-    title: "HIPAA Security Awareness Training for Healthcare Practices",
-    description:
-      "Meet the HIPAA training requirement and turn your staff into your first line of defense. Documented, audit-ready, and built for small practices.",
-  },
-};
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+import Link from 'next/link';
 
-const modules = [
-  {
-    title: "HIPAA & PHI Fundamentals",
-    description:
-      "What counts as protected health information, the minimum necessary rule, and everyday habits that keep patient data safe.",
-  },
-  {
-    title: "Phishing & Email Threats",
-    description:
-      "How to spot the fake login pages, invoice scams, and spoofed vendor emails that target medical offices—plus what to do when one gets through.",
-  },
-  {
-    title: "Passwords & Access Security",
-    description:
-      "Strong passwords, multi-factor authentication, and why sharing that one clinic login puts your whole practice at risk.",
-  },
-  {
-    title: "Ransomware Awareness",
-    description:
-      "Why healthcare is the #1 ransomware target, the warning signs of an infection, and how to keep one wrong click from locking your EHR.",
-  },
-  {
-    title: "Device & Physical Security",
-    description:
-      "Securing workstations, laptops, and mobile devices, locking screens, and handling PHI on paper and in the waiting room.",
-  },
-  {
-    title: "Breach Response Basics",
-    description:
-      "Who to call, what to document, and the first steps that protect your patients—and your practice—when something goes wrong.",
-  },
-];
+interface Course {
+  id: number;
+  slug: string;
+  title: string;
+  description: string;
+  duration_hours: number;
+  difficulty: string;
+  icon: string;
+}
 
-const included = [
-  "Annual security awareness training for every staff member",
-  "Simulated phishing campaigns with staff-level reporting",
-  "Completion certificates and audit-ready training logs",
-  "Role-based content for front desk, clinical, and admin staff",
-  "New-hire onboarding training within the first week",
-  "Ongoing threat alerts when new scams target healthcare",
-];
+interface Enrollment {
+  course_id: number;
+  completion_percent: number;
+}
 
 export default function TrainingPage() {
+  const router = useRouter();
+  const supabaseRef = useRef<any>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Initialize Supabase client only on client side
+    supabaseRef.current = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+
+    const checkAuth = async () => {
+      const { data: { user } } = await supabaseRef.current.auth.getUser();
+      if (!user) {
+        router.push('/auth/login');
+        return;
+      }
+      setUser(user);
+      await fetchCourses();
+      await fetchEnrollments(user.id);
+    };
+
+    checkAuth();
+  }, [router]);
+
+  const fetchCourses = async () => {
+    const { data, error } = await supabaseRef.current
+      .from('courses')
+      .select('*')
+      .order('course_order', { ascending: true });
+
+    if (!error && data) {
+      setCourses(data);
+    }
+    setLoading(false);
+  };
+
+  const fetchEnrollments = async (userId: string) => {
+    const { data } = await supabaseRef.current
+      .from('course_enrollments')
+      .select('course_id, completion_percent')
+      .eq('user_id', userId);
+
+    if (data) {
+      setEnrollments(data);
+    }
+  };
+
+  const enrollCourse = async (courseId: number) => {
+    const { error } = await supabaseRef.current
+      .from('course_enrollments')
+      .insert({
+        user_id: user.id,
+        course_id: courseId,
+      });
+
+    if (!error) {
+      await fetchEnrollments(user.id);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading courses...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
-      <Header />
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">HCS Training Platform</h1>
+          <p className="text-xl text-gray-600">
+            Master HCS systems with interactive training courses
+          </p>
+        </div>
 
-      <main id="main-content">
-        {/* Hero Section */}
-        <section className="bg-primary-light py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-text mb-6">
-                HIPAA Security Awareness Training
-              </h1>
-              <p className="text-xl text-text-muted">
-                Your staff are your first line of defense—and your biggest risk. We turn
-                everyday clicks into confident, compliant decisions.
-              </p>
-            </div>
-          </div>
-        </section>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {courses.map((course) => {
+            const enrollment = enrollments.find(e => e.course_id === course.id);
+            const isEnrolled = !!enrollment;
+            const completionPercent = enrollment?.completion_percent || 0;
 
-        {/* Why It Matters */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                  <h2 className="text-3xl font-bold text-text mb-6">
-                    Training Isn't Optional—It's the Law
+            return (
+              <div
+                key={course.id}
+                className="bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow overflow-hidden"
+              >
+                <div className="h-32 bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-4xl">
+                  {course.icon}
+                </div>
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    {course.title}
                   </h2>
-                  <div className="space-y-4 text-text-muted">
-                    <p>
-                      The HIPAA Security Rule requires every covered entity to implement a
-                      security awareness and training program for all workforce members. It's
-                      one of the first things an auditor asks for after a breach—and one of the
-                      most common gaps in small practices.
-                    </p>
-                    <p>
-                      More than 90% of successful attacks on healthcare organizations start with
-                      a single employee clicking the wrong link. No firewall fixes that. Trained
-                      staff do.
-                    </p>
-                    <p>
-                      We handle the whole program—content, delivery, phishing tests, and the
-                      documentation you'll need if the OCR ever comes knocking.
-                    </p>
-                  </div>
-                </div>
+                  <p className="text-gray-600 mb-4">{course.description}</p>
 
-                <div className="bg-primary-light p-8 rounded-card">
-                  <h3 className="text-2xl font-bold text-text mb-6">Why Practices Choose Us</h3>
-                  <div className="space-y-3 text-text">
-                    {included.map((item) => (
-                      <div key={item} className="flex items-start">
-                        <span className="text-primary mr-3 text-xl">✓</span>
-                        <span>{item}</span>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="flex gap-2">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                        {course.difficulty}
+                      </span>
+                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                        {course.duration_hours}h
+                      </span>
+                    </div>
+                  </div>
+
+                  {isEnrolled && (
+                    <div className="mb-4">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-600">Progress</span>
+                        <span className="text-sm font-bold text-blue-600">{completionPercent}%</span>
                       </div>
-                    ))}
-                  </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all"
+                          style={{ width: `${completionPercent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  )}
+
+                  {isEnrolled ? (
+                    <Link
+                      href={`/training/${course.slug}`}
+                      className="w-full block text-center bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    >
+                      Continue Learning
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => enrollCourse(course.id)}
+                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    >
+                      Enroll Now
+                    </button>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Training Modules */}
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-text mb-4">What We Cover</h2>
-                <p className="text-xl text-text-muted">
-                  Practical, plain-language training built for busy medical and dental teams—not
-                  generic corporate slideshows.
-                </p>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                {modules.map((module) => (
-                  <div key={module.title} className="bg-white p-6 rounded-card border border-border">
-                    <h3 className="text-lg font-semibold text-text mb-2">{module.title}</h3>
-                    <p className="text-text-muted">{module.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-text mb-4">How It Works</h2>
-                <p className="text-xl text-text-muted">
-                  Included in every service package—up and running in your first month.
-                </p>
-              </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                    1
-                  </div>
-                  <h3 className="text-lg font-semibold text-text mb-2">Enroll Your Team</h3>
-                  <p className="text-text-muted">
-                    We add every staff member and tailor the content to their role—no IT lift on
-                    your end.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                    2
-                  </div>
-                  <h3 className="text-lg font-semibold text-text mb-2">Train & Test</h3>
-                  <p className="text-text-muted">
-                    Staff complete short, on-demand modules and receive periodic phishing
-                    simulations to keep skills sharp.
-                  </p>
-                </div>
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                    3
-                  </div>
-                  <h3 className="text-lg font-semibold text-text mb-2">Document & Report</h3>
-                  <p className="text-text-muted">
-                    You get completion certificates and audit-ready logs that prove compliance
-                    year after year.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-16 bg-primary text-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Make Your Team Your Strongest Defense
-            </h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-              Security awareness training is included in every Healthcare IT Solutions package.
-              Schedule a free assessment and we'll get your staff trained and documented.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/assessment"
-                className="bg-white text-primary hover:bg-primary-light px-8 py-4 rounded-button font-semibold text-lg transition-all"
-              >
-                Schedule Free Assessment
-              </Link>
-              <Link
-                href="/services"
-                className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 rounded-button font-semibold text-lg transition-all"
-              >
-                View Service Packages
-              </Link>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <Footer />
-    </>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }

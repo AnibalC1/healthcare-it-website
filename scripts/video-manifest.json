@@ -1,0 +1,118 @@
+{
+  "videos": [
+    {
+      "course": "hcs-provider-training",
+      "module": "medication-management",
+      "lesson": "medication-ordering",
+      "file": "Med Order Entry.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Med Order Entry.mp4",
+      "duration_minutes": 8,
+      "storage_path": "/hcs-content/videos/provider-training/med-order-entry.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "medication-management",
+      "lesson": "admission-medication-reconciliation",
+      "file": "Admission Medication Reconciliation Process.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Admission Medication Reconciliation Process.mp4",
+      "duration_minutes": 6,
+      "storage_path": "/hcs-content/videos/provider-training/admission-medication-reconciliation.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "medication-management",
+      "lesson": "discharge-medication-reconciliation",
+      "file": "Discharge Medication Reconciliation Process.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Discharge Medication Reconciliation Process.mp4",
+      "duration_minutes": 7,
+      "storage_path": "/hcs-content/videos/provider-training/discharge-medication-reconciliation.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "medication-management",
+      "lesson": "antibiotic-review",
+      "file": "Antibiotic Review and Reorder Med.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Antibiotic Review and Reorder Med.mp4",
+      "duration_minutes": 5,
+      "storage_path": "/hcs-content/videos/provider-training/antibiotic-review.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "medication-management",
+      "lesson": "edit-discontinue-medication",
+      "file": "How to edit or discontinue a med.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/How to edit or discontinue a med.mp4",
+      "duration_minutes": 4,
+      "storage_path": "/hcs-content/videos/provider-training/edit-discontinue-med.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "workflows",
+      "lesson": "provider-training-overview",
+      "file": "Provider HCS Web Training.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Provider HCS Web Training.mp4",
+      "duration_minutes": 12,
+      "storage_path": "/hcs-content/videos/provider-training/provider-training-overview.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "workflows",
+      "lesson": "entering-medical-consult",
+      "file": "Entering a medical consult.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Entering a medical consult.mp4",
+      "duration_minutes": 6,
+      "storage_path": "/hcs-content/videos/provider-training/entering-medical-consult.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "workflows",
+      "lesson": "signing-orders-reviewing-labs",
+      "file": "Signing Orders and Reviewing Labs.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Signing Orders and Reviewing Labs.mp4",
+      "duration_minutes": 9,
+      "storage_path": "/hcs-content/videos/provider-training/signing-orders-labs.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "workflows",
+      "lesson": "setting-up-patient-list",
+      "file": "Setting up My Patient List and My Patient Work List.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Setting up My Patient List and My Patient Work List.mp4",
+      "duration_minutes": 10,
+      "storage_path": "/hcs-content/videos/provider-training/setting-up-patient-list.mp4"
+    },
+    {
+      "course": "hcs-provider-training",
+      "module": "workflows",
+      "lesson": "provider-focus",
+      "file": "Provider Focus.mp4",
+      "source": "/workspace/extra/usb/HCS Provider/Provider Focus.mp4",
+      "duration_minutes": 11,
+      "storage_path": "/hcs-content/videos/provider-training/provider-focus.mp4"
+    },
+    {
+      "course": "hcs-web-provider-platform",
+      "module": "patient-worklist-management",
+      "lesson": "patient-worklist-esign-labs",
+      "file": "Patient Worklist.Esign Orders.Labs.mp4",
+      "source": "/workspace/extra/usb/HCS Web - Provider/Patient Worklist.Esign Orders.Labs.mp4",
+      "duration_minutes": 14,
+      "storage_path": "/hcs-content/videos/web-provider/patient-worklist-esign-labs.mp4"
+    },
+    {
+      "course": "hcs-web-provider-platform",
+      "module": "platform-training",
+      "lesson": "web-provider-training",
+      "file": "Provider HCS Web Training.mp4",
+      "source": "/workspace/extra/usb/HCS Web - Provider/Provider HCS Web Training.mp4",
+      "duration_minutes": 12,
+      "storage_path": "/hcs-content/videos/web-provider/provider-training.mp4"
+    }
+  ],
+  "storage_instructions": {
+    "step1": "Upload all videos from 'source' paths to Supabase Storage bucket 'hcs-videos'",
+    "step2": "Update NEXT_PUBLIC_SUPABASE_URL in .env.local with storage URL",
+    "step3": "Or configure CDN (Cloudflare, AWS CloudFront) for video delivery",
+    "staging": "For staging, copy videos to public/hcs-content/videos/ and update paths"
+  }
+}
