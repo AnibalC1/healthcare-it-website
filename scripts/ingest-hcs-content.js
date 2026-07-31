@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
+const pdfParse = require('pdf-parse');
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -217,17 +218,46 @@ const COURSES = [
 
 async function extractPdfText(filePath) {
   try {
-    // For now, return a placeholder
-    // In production, you would use pdf-parse or similar
-    // This is a simplified version - you'd need to implement actual PDF extraction
+    if (!fs.existsSync(filePath)) {
+      console.warn(`PDF file not found: ${filePath}`);
+      return null;
+    }
+
+    const dataBuffer = fs.readFileSync(filePath);
+    const pdfData = await pdfParse(dataBuffer);
+
     const fileName = path.basename(filePath);
-    return `<div class="prose">
-      <h2>${fileName}</h2>
-      <p>Content from: ${filePath}</p>
-      <p>Note: In production, actual PDF content would be extracted and formatted here.</p>
+    const text = pdfData.text;
+
+    // Format text into HTML with basic structure
+    const paragraphs = text
+      .split(/\n\n+/)
+      .filter(p => p.trim().length > 0)
+      .map(p => {
+        const trimmed = p.trim();
+        // Detect headings (all caps lines)
+        if (trimmed.match(/^[A-Z\s]+$/) && trimmed.length < 100) {
+          return `<h3 class="text-lg font-semibold mt-4 mb-2">${trimmed}</h3>`;
+        }
+        return `<p class="mb-3 text-gray-700">${trimmed}</p>`;
+      })
+      .join('\n');
+
+    const htmlContent = `<div class="prose prose-sm max-w-none">
+      <h2 class="text-2xl font-bold mb-4">${fileName.replace(/\.pdf$/i, '')}</h2>
+      <div class="bg-blue-50 border-l-4 border-blue-600 p-4 mb-6">
+        <p class="text-sm text-gray-600">
+          <strong>Document:</strong> ${fileName}<br/>
+          <strong>Pages:</strong> ${pdfData.numpages}
+        </p>
+      </div>
+      ${paragraphs}
     </div>`;
+
+    console.log(`  ✓ Extracted ${pdfData.numpages} pages from ${fileName}`);
+    return htmlContent;
   } catch (error) {
-    console.error(`Error extracting PDF ${filePath}:`, error);
+    console.error(`Error extracting PDF ${filePath}:`, error.message);
     return null;
   }
 }
