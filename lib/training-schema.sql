@@ -141,6 +141,9 @@ CREATE POLICY "Users can only see their own progress" ON user_progress
 CREATE POLICY "Users can update their own progress" ON user_progress
   FOR UPDATE USING (auth.uid() = user_id);
 
+CREATE POLICY "Users can insert their own progress" ON user_progress
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
 CREATE POLICY "Users can only see their own enrollments" ON course_enrollments
   FOR SELECT USING (auth.uid() = user_id);
 
