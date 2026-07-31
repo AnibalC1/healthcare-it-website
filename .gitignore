@@ -15,13 +15,27 @@ node_modules/
 /build
 /dist
 
-# Environment variables
+# Environment variables (CRITICAL - DO NOT COMMIT KEYS)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env*.local
+.env.*.local
+
+# API Keys and Credentials (CRITICAL)
+*.pem
+*.key
+*.pub
+*.cert
+id_rsa*
+id_ed25519*
+private-key
+credentials.json
+service-account.json
+secrets.json
+.secrets/
 
 # Debug
 npm-debug.log*
@@ -48,6 +62,23 @@ next-env.d.ts
 
 # Cal.com
 cal-config/secrets.json
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Video files (large)
+*.mp4
+*.mov
+*.mkv
+public/hcs-content/videos/
+
+# Backups and archives
+*.backup
+*.bak
+_backup/
+_archive_*/
 
 # Misc
 *.log
