@@ -57,12 +57,36 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Services</h4>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li>HIPAA Compliance Audits</li>
-              <li>Network Security</li>
-              <li>24/7 IT Support</li>
-              <li>Equipment Management</li>
-              <li>Backup & Recovery</li>
-              <li>Security Training</li>
+              <li>
+                <Link href="/services" className="hover:text-primary-light transition-colors">
+                  HIPAA Compliance Audits
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-primary-light transition-colors">
+                  Network Security
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-primary-light transition-colors">
+                  24/7 IT Support
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-primary-light transition-colors">
+                  Equipment Management
+                </Link>
+              </li>
+              <li>
+                <Link href="/services" className="hover:text-primary-light transition-colors">
+                  Backup & Recovery
+                </Link>
+              </li>
+              <li>
+                <Link href="/training" className="hover:text-primary-light transition-colors">
+                  Security Training
+                </Link>
+              </li>
             </ul>
           </div>
 
