@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 interface Module {
@@ -49,20 +49,22 @@ export default function CourseDetailsPage() {
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set([0]));
 
   useEffect(() => {
-    // Initialize Supabase on client side only
-    supabaseRef.current = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-    );
+    // Use the shared Supabase client (safe placeholder fallbacks avoid a
+    // client-side crash when env vars are not configured).
+    supabaseRef.current = supabase;
 
     const checkAuth = async () => {
-      const { data: { user } } = await supabaseRef.current.auth.getUser();
-      if (!user) {
-        router.push('/auth/login');
-        return;
+      try {
+        const { data: { user } } = await supabaseRef.current.auth.getUser();
+        if (!user) {
+          router.push('/portal/login');
+          return;
+        }
+        setUser(user);
+        await fetchCourseData();
+      } catch {
+        router.push('/portal/login');
       }
-      setUser(user);
-      await fetchCourseData();
     };
 
     checkAuth();

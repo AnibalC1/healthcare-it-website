@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 
 interface Course {
@@ -29,21 +29,23 @@ export default function TrainingPage() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Initialize Supabase client only on client side
-    supabaseRef.current = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-    );
+    // Use the shared Supabase client (safe placeholder fallbacks avoid a
+    // client-side crash when env vars are not configured).
+    supabaseRef.current = supabase;
 
     const checkAuth = async () => {
-      const { data: { user } } = await supabaseRef.current.auth.getUser();
-      if (!user) {
-        router.push('/auth/login');
-        return;
+      try {
+        const { data: { user } } = await supabaseRef.current.auth.getUser();
+        if (!user) {
+          router.push('/portal/login');
+          return;
+        }
+        setUser(user);
+        await fetchCourses();
+        await fetchEnrollments(user.id);
+      } catch {
+        router.push('/portal/login');
       }
-      setUser(user);
-      await fetchCourses();
-      await fetchEnrollments(user.id);
     };
 
     checkAuth();
