@@ -102,7 +102,7 @@ export default function CourseDetailsPage() {
 
       if (modulesData) {
         // Sort lessons within each module
-        const sortedModules = modulesData.map(m => ({
+        const sortedModules = modulesData.map((m: any) => ({
           ...m,
           lessons: (m.lessons || []).sort((a: any, b: any) => a.lesson_order - b.lesson_order)
         }));
