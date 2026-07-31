@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
-import LessonViewer from '@/components/LessonViewer';
 
 interface Lesson {
   id: number;
@@ -44,10 +43,7 @@ export default function LessonPage() {
   const moduleSlug = params.moduleSlug as string;
   const lessonSlug = params.lessonSlug as string;
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  );
+  const supabaseRef = useRef<any>(null);
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [lessonContent, setLessonContent] = useState<LessonContent | null>(null);
   const [module, setModule] = useState<Module | null>(null);
@@ -58,8 +54,14 @@ export default function LessonPage() {
   const [markingComplete, setMarkingComplete] = useState(false);
 
   useEffect(() => {
+    // Initialize Supabase on client side only
+    supabaseRef.current = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseRef.current.auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -69,12 +71,12 @@ export default function LessonPage() {
     };
 
     checkAuth();
-  }, [router, supabase, courseSlug, moduleSlug, lessonSlug]);
+  }, [router, courseSlug, moduleSlug, lessonSlug]);
 
   const fetchData = async () => {
     try {
       // Get course
-      const { data: courseData } = await supabase
+      const { data: courseData } = await supabaseRef.current
         .from('courses')
         .select('*')
         .eq('slug', courseSlug)
@@ -84,7 +86,7 @@ export default function LessonPage() {
         setCourse(courseData);
 
         // Get module
-        const { data: moduleData } = await supabase
+        const { data: moduleData } = await supabaseRef.current
           .from('course_modules')
           .select('*')
           .eq('slug', moduleSlug)
@@ -95,7 +97,7 @@ export default function LessonPage() {
           setModule(moduleData);
 
           // Get lesson
-          const { data: lessonData } = await supabase
+          const { data: lessonData } = await supabaseRef.current
             .from('lessons')
             .select('*')
             .eq('slug', lessonSlug)
@@ -106,7 +108,7 @@ export default function LessonPage() {
             setLesson(lessonData);
 
             // Get lesson content
-            const { data: contentData } = await supabase
+            const { data: contentData } = await supabaseRef.current
               .from('lesson_content')
               .select('html_content')
               .eq('lesson_id', lessonData.id)
@@ -118,7 +120,7 @@ export default function LessonPage() {
 
             // Get user progress
             if (user) {
-              const { data: progressData } = await supabase
+              const { data: progressData } = await supabaseRef.current
                 .from('user_progress')
                 .select('*')
                 .eq('user_id', user.id)
@@ -144,7 +146,7 @@ export default function LessonPage() {
 
     setMarkingComplete(true);
     try {
-      const { error } = await supabase
+      const { error } = await supabaseRef.current
         .from('user_progress')
         .upsert({
           user_id: user.id,

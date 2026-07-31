@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
@@ -39,10 +39,7 @@ export default function CourseDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const courseSlug = params.courseSlug as string;
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-  );
+  const supabaseRef = useRef<any>(null);
 
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
@@ -52,8 +49,14 @@ export default function CourseDetailsPage() {
   const [expandedModules, setExpandedModules] = useState<Set<number>>(new Set([0]));
 
   useEffect(() => {
+    // Initialize Supabase on client side only
+    supabaseRef.current = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseRef.current.auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -63,11 +66,11 @@ export default function CourseDetailsPage() {
     };
 
     checkAuth();
-  }, [router, supabase, courseSlug]);
+  }, [router, courseSlug]);
 
   const fetchCourseData = async () => {
     // Fetch course
-    const { data: courseData } = await supabase
+    const { data: courseData } = await supabaseRef.current
       .from('courses')
       .select('*')
       .eq('slug', courseSlug)
@@ -77,7 +80,7 @@ export default function CourseDetailsPage() {
       setCourse(courseData);
 
       // Fetch modules
-      const { data: modulesData } = await supabase
+      const { data: modulesData } = await supabaseRef.current
         .from('course_modules')
         .select(`
           id,
@@ -108,7 +111,7 @@ export default function CourseDetailsPage() {
 
       // Fetch user progress
       if (user) {
-        const { data: progressData } = await supabase
+        const { data: progressData } = await supabaseRef.current
           .from('user_progress')
           .select('lesson_id, completed_at')
           .eq('user_id', user.id);

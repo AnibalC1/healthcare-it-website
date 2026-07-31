@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
@@ -20,21 +20,23 @@ interface Enrollment {
   completion_percent: number;
 }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-);
-
 export default function TrainingPage() {
   const router = useRouter();
+  const supabaseRef = useRef<any>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    // Initialize Supabase client only on client side
+    supabaseRef.current = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+    );
+
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabaseRef.current.auth.getUser();
       if (!user) {
         router.push('/auth/login');
         return;
@@ -45,10 +47,10 @@ export default function TrainingPage() {
     };
 
     checkAuth();
-  }, [router, supabase]);
+  }, [router]);
 
   const fetchCourses = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseRef.current
       .from('courses')
       .select('*')
       .order('course_order', { ascending: true });
@@ -60,7 +62,7 @@ export default function TrainingPage() {
   };
 
   const fetchEnrollments = async (userId: string) => {
-    const { data } = await supabase
+    const { data } = await supabaseRef.current
       .from('course_enrollments')
       .select('course_id, completion_percent')
       .eq('user_id', userId);
@@ -71,7 +73,7 @@ export default function TrainingPage() {
   };
 
   const enrollCourse = async (courseId: number) => {
-    const { error } = await supabase
+    const { error } = await supabaseRef.current
       .from('course_enrollments')
       .insert({
         user_id: user.id,
