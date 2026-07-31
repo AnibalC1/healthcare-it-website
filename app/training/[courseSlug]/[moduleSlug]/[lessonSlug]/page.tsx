@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import Link from 'next/link';
 import LessonViewer from '@/components/LessonViewer';
 
@@ -44,7 +44,10 @@ export default function LessonPage() {
   const moduleSlug = params.moduleSlug as string;
   const lessonSlug = params.lessonSlug as string;
 
-  const supabase = createClientComponentClient();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  );
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [lessonContent, setLessonContent] = useState<LessonContent | null>(null);
   const [module, setModule] = useState<Module | null>(null);

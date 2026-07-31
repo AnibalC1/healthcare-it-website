@@ -30,7 +30,7 @@ const COURSES = [
     duration_hours: 5,
     icon: '🖥️',
     order: 1,
-    folder: '/workspace/extra/usb/HCS IT Documents',
+    folder: '/workspace/extra/shared/hcs-training-content/HCS IT Documents',
     modules: [
       {
         slug: 'hardware-configuration',
@@ -86,7 +86,7 @@ const COURSES = [
     duration_hours: 15,
     icon: '👨‍⚕️',
     order: 2,
-    folder: '/workspace/extra/usb/HCS Provider',
+    folder: '/workspace/extra/shared/hcs-training-content/HCS Provider',
     modules: [
       {
         slug: 'provider-manual',
@@ -162,7 +162,7 @@ const COURSES = [
     duration_hours: 12,
     icon: '🌐',
     order: 3,
-    folder: '/workspace/extra/usb/HCS Web - Provider',
+    folder: '/workspace/extra/shared/hcs-training-content/HCS Web - Provider',
     modules: [
       {
         slug: 'web-platform-guide',
