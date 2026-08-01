@@ -116,8 +116,19 @@ export default function LessonPage() {
               .eq('lesson_id', lessonData.id)
               .single();
 
-            if (contentData) {
+            if (contentData?.html_content) {
               setLessonContent(contentData);
+            } else if (lessonData.content_url && lessonData.content_url.endsWith('.html')) {
+              // Document lessons store their converted HTML as a static file
+              // referenced by content_url, rather than in the database.
+              try {
+                const res = await fetch(lessonData.content_url);
+                if (res.ok) {
+                  setLessonContent({ html_content: await res.text() });
+                }
+              } catch {
+                // leave content empty; the page shows the "being prepared" state
+              }
             }
 
             // Get user progress
