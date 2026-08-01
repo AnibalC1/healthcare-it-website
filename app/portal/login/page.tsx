@@ -25,8 +25,8 @@ export default function PortalLogin() {
 
       if (authError) throw authError;
 
-      // Redirect to portal dashboard
-      router.push('/portal/dashboard');
+      // Redirect to the training platform
+      router.push('/training');
     } catch (err: any) {
       setError(err.message || 'Invalid email or password');
     } finally {
