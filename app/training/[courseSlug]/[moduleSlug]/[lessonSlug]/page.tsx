@@ -245,11 +245,11 @@ export default function LessonPage() {
             <div className="prose max-w-none">
               <div dangerouslySetInnerHTML={{ __html: lessonContent.html_content }} />
             </div>
-          ) : (
+          ) : lesson.content_type !== 'video' ? (
             <div className="text-center text-gray-600 py-12">
-              <p>Content loading...</p>
+              <p>Content for this lesson is being prepared.</p>
             </div>
-          )}
+          ) : null}
 
           {/* Completion Button */}
           <div className="mt-12 pt-8 border-t">
